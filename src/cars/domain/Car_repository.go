@@ -7,5 +7,7 @@ type ICar interface {
 	GetAll() ([]entities.Car, error)
 	GetById(id int) (entities.Car, error)
 	Edit(entities.Car) error
+	UpdateAvailability(id int, available bool) error
+	GetAvailable() ([]entities.Car, error)
 	Delete(id int) error
 }
