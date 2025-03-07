@@ -2,11 +2,13 @@ package a_rabbit
 
 import (
 	"ejercicio1/src/Appointment/application/repositories"
-	"encoding/json"
-	"log"
-
 	"ejercicio1/src/Appointment/domain/entities"
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -18,7 +20,17 @@ type RabbitMQAdapter struct {
 var _ repositories.NotificationPort = (*RabbitMQAdapter)(nil)
 
 func NewRabbitMQAdapter() (*RabbitMQAdapter, error) {
-	conn, err := amqp.Dial("amqp://milron:vazper12@54.243.91.77:5672/")
+	if err := godotenv.Load(); err != nil {
+		log.Println("No se pudo cargar el archivo .env, asegurate de que existe")
+	}
+
+	rabbitURL := os.Getenv("RABBITMQ_URL")
+	if rabbitURL == "" {
+		log.Println("RABBITMQ_URL no está definida en el archivo .env")
+		return nil, fmt.Errorf("RABBITMQ_URL no está definida")
+	}
+
+	conn, err := amqp.Dial(rabbitURL)
 	if err != nil {
 		log.Printf("Error conectando a RabbitMQ: %v", err)
 		return nil, err
