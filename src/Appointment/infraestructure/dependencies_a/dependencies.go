@@ -2,10 +2,12 @@ package dependencies_a
 
 import (
 	"ejercicio1/src/Appointment/application"
-	"ejercicio1/src/Appointment/infraestructure/adapter"
+	"ejercicio1/src/Appointment/application/repositories"
+	"ejercicio1/src/Appointment/infraestructure/adapters"
+	"ejercicio1/src/Appointment/infraestructure/adapters/a_rabbit"
 	"ejercicio1/src/Appointment/infraestructure/controllers"
-	"ejercicio1/src/Appointment/infraestructure/db"
 	"ejercicio1/src/core"
+	"log"
 )
 
 func InitAppointments() (
@@ -16,16 +18,21 @@ func InitAppointments() (
 	*controllers.ViewAppointmentByIdController,
 	*controllers.UpdateAppointmentStatusController,
 	*controllers.GetAppointmentStatusController,
-	*controllers.NotificationController,
 	error,
 ) {
 
 	pool := core.GetDBPool()
-	ps := db.NewMySQL(pool.DB)
+	ps := adapters.NewMySQL(pool.DB)
 
-	notificationAdapter := adapter.NewNotificationAdapter()
+	rabbitMQAdapter, err := a_rabbit.NewRabbitMQAdapter()
+	if err != nil {
+		log.Printf("Error inicializando RabbitMQ: %v", err)
+		return nil, nil, nil, nil, nil, nil, nil, err
+	}
 
-	createAppointment := application.NewCreateAppointment(ps, notificationAdapter)
+	serviceNotification := repositories.NewServiceNotification(rabbitMQAdapter)
+
+	createAppointment := application.NewCreateAppointment(ps, serviceNotification)
 	listAppointment := application.NewListAppointments(ps)
 	editAppointment := application.NewEditAppointment(ps)
 	deleteAppointment := application.NewDeleteAppointment(ps)
@@ -33,7 +40,7 @@ func InitAppointments() (
 	updateAppointmentStatus := application.NewUpdateAppointmentStatus(ps)
 	viewAppointmentStatus := application.NewViewAppointmentStatus(ps)
 
-	createAppointmentController := controllers.NewCreateAppointmentController(*createAppointment)
+	createAppointmentController := controllers.NewCreateAppointmentController(*createAppointment, ps)
 	listAppointmentController := controllers.NewListAppointmentsController(*listAppointment)
 	editAppointmentController := controllers.NewEditAppointmentController(*editAppointment)
 	deleteAppointmentController := controllers.NewDeleteAppointmentController(*deleteAppointment)
@@ -41,9 +48,7 @@ func InitAppointments() (
 	updateAppointmentStatusController := controllers.NewUpdateAppointmentStatusController(*updateAppointmentStatus)
 	viewAppointmentStatusController := controllers.NewGetAppointmentStatusController(*viewAppointmentStatus)
 
-	notificationController := controllers.NewNotificationController(notificationAdapter)
-
 	return createAppointmentController, listAppointmentController, deleteAppointmentController,
-		editAppointmentController, viewByIdAppointmentController, updateAppointmentStatusController,
-		viewAppointmentStatusController, notificationController, nil
+		editAppointmentController, viewByIdAppointmentController,
+		updateAppointmentStatusController, viewAppointmentStatusController, nil
 }

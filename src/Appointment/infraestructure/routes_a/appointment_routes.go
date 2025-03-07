@@ -16,7 +16,7 @@ func RegisterAppointmentRoutes(
 	deleteAppointmentController *controllers.DeleteAppointmentController,
 	updateAppointmentStatusController *controllers.UpdateAppointmentStatusController,
 	getAppointmentStatusController *controllers.GetAppointmentStatusController,
-	notificationController *controllers.NotificationController,
+
 ) {
 	r.POST("/appointments", createAppointmentController.Execute)
 	r.GET("/appointments", listAppointmentController.Execute)
@@ -25,5 +25,5 @@ func RegisterAppointmentRoutes(
 	r.DELETE("/appointments/:id", deleteAppointmentController.Execute)
 	r.PUT("/appointments/:id/status", updateAppointmentStatusController.Execute)
 	r.GET("/appointments/:id/status", getAppointmentStatusController.Execute)
-	r.GET("/notifications", notificationController.Execute)
+
 }

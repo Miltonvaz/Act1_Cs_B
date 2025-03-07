@@ -28,7 +28,10 @@ func main() {
 		return
 	}
 
-	createAppointmentController, listAppointmentController, deleteAppointmentController, updateAppointmentController, viewByIdAppointmentController, updateAppointmentStatusController, viewAppointmentStatusController, notificationController, err := dependencies_a.InitAppointments()
+	createAppointmentController, listAppointmentController, deleteAppointmentController,
+		updateAppointmentController, viewByIdAppointmentController, updateAppointmentStatusController,
+		viewAppointmentStatusController, err := dependencies_a.InitAppointments()
+
 	if err != nil {
 		log.Fatalf("Error initializing appointment dependencies: %v", err)
 		return
@@ -64,7 +67,6 @@ func main() {
 		deleteAppointmentController,
 		updateAppointmentStatusController,
 		viewAppointmentStatusController,
-		notificationController,
 	)
 
 	err = r.Run(":8080")

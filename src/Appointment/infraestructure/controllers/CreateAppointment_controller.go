@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"ejercicio1/src/Appointment/application"
+	"ejercicio1/src/Appointment/domain"
 	"ejercicio1/src/Appointment/domain/entities"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -9,11 +10,15 @@ import (
 )
 
 type CreateAppointmentController struct {
-	usecase application.CreateAppointment
+	usecase         application.CreateAppointment
+	appointmentRepo domain.IAppointment
 }
 
-func NewCreateAppointmentController(usecase application.CreateAppointment) *CreateAppointmentController {
-	return &CreateAppointmentController{usecase: usecase}
+func NewCreateAppointmentController(usecase application.CreateAppointment, appointmentRepo domain.IAppointment) *CreateAppointmentController {
+	return &CreateAppointmentController{
+		usecase:         usecase,
+		appointmentRepo: appointmentRepo,
+	}
 }
 
 func (cac *CreateAppointmentController) Execute(c *gin.Context) {
@@ -27,6 +32,7 @@ func (cac *CreateAppointmentController) Execute(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Test date must be in the future"})
 		return
 	}
+
 	validStatuses := []string{"pending", "confirmed", "canceled"}
 	statusValid := false
 	for _, validStatus := range validStatuses {
