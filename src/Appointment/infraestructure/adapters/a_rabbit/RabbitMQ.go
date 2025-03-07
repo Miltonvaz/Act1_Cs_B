@@ -38,7 +38,7 @@ func NewRabbitMQAdapter() (*RabbitMQAdapter, error) {
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Printf("Error abriendo canal: %v", err)
+		log.Printf("Error abriendo canl: %v", err)
 		return nil, err
 	}
 
